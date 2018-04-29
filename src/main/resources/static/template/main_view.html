@@ -1,42 +1,51 @@
-<div ng-controller="PersonController">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-7">
-                <div class="table-content">
-                    <table st-table="data" class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-md-2">
-                                    {{'NAME' | translate}}
-                                </th>
-                                <th class="col-md-2">
-                                    {{'GENDER' | translate}}
-                                </th>
-                                <th class="col-md-2">
-                                    {{'FATHER' | translate}}
-                                </th>
-                                <th class="col-md-2">
-                                    {{'MOTHER' | translate}}
-                                </th>
-                                <th class="col-md-4">
-                                    {{'CHILDRENS' | translate}}
-                                </th>
-                            </tr>
+<div class="container" ng-controller="PersonController">
+    <div class="row bpc-empty">
+        <div class="col-md-6 col-md-offset-1">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <p>{{ 'APPLICATION_TITLE' | translate }}</p>
+                </div>
+                <div class="panel-body">
+                    <table st-table="displayedData" st-safe-src="data" class="table table-sm">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>{{ 'NAME' | translate }}</th>
+                            <th>{{ 'GENDER' | translate }}</th>
+                            <th>{{ 'FATHER' | translate }}</th>
+                            <th>{{ 'MOTHER' | translate }}</th>
+                            <th>{{ 'CHILDRENS' | translate }}</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="(key, person) in data">
-                                <td>{{ person.name }}</td>
-                                <td>{{ person.gender | translate }}</td>
-                                <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
-                                <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
-                                <td>{{ getPersonNamesByIds(person.childs) }}</td>
-                            </tr>
+                        <tr ng-repeat="(key, person) in displayedData">
+                            <td>{{ person.name }}</td>
+                            <td>{{ person.gender | translate }}</td>
+                            <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
+                            <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
+                            <td>{{ getPersonNamesByIds(person.childs) }}</td>
+                        </tr>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div st-pagination="" st-items-by-page="settings.itemsByPage" st-displayed-pages="settings.displayedPages"></div>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
-            <div class="col-md-5">
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <p>{{ 'PHOTO' | translate }}</p>
+                </div>
+                <div class="panel-body">
+
+                </div>
             </div>
         </div>
+
     </div>
 </div>

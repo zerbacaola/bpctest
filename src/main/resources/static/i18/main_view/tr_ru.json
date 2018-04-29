@@ -1,9 +1,11 @@
 {
-    "NAME"      :   "Имя",
-    "GENDER"    :   "Пол",
-    "FATHER"    :   "Отец",
-    "MOTHER"    :   "Мать",
-    "CHILDRENS" :   "Дети",
-    "MALE"      :   "М",
-    "FEMALE"    :   "Ж"
+    "NAME"              :   "Имя",
+    "GENDER"            :   "Пол",
+    "FATHER"            :   "Отец",
+    "MOTHER"            :   "Мать",
+    "CHILDRENS"         :   "Дети",
+    "MALE"              :   "М",
+    "FEMALE"            :   "Ж",
+    "APPLICATION_TITLE" :   "Просмотр сведений о клиентах",
+    "PHOTO"             :   "Фото"
 }
