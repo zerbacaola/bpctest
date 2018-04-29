@@ -1,0 +1,42 @@
+<div ng-controller="PersonController">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="table-content">
+                    <table st-table="data" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="col-md-2">
+                                    {{'NAME' | translate}}
+                                </th>
+                                <th class="col-md-2">
+                                    {{'GENDER' | translate}}
+                                </th>
+                                <th class="col-md-2">
+                                    {{'FATHER' | translate}}
+                                </th>
+                                <th class="col-md-2">
+                                    {{'MOTHER' | translate}}
+                                </th>
+                                <th class="col-md-4">
+                                    {{'CHILDRENS' | translate}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="(key, person) in data">
+                                <td>{{ person.name }}</td>
+                                <td>{{ person.gender | translate }}</td>
+                                <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
+                                <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
+                                <td>{{ getPersonNamesByIds(person.childs) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-5">
+            </div>
+        </div>
+    </div>
+</div>

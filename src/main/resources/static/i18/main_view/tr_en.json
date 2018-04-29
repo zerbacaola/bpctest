@@ -1,0 +1,9 @@
+{
+    "NAME"      :   "Name",
+    "GENDER"    :   "Gender",
+    "FATHER"    :   "Father",
+    "MOTHER"    :   "Mother",
+    "CHILDRENS" :   "Childrens",
+    "MALE"      :   "M",
+    "FEMALE"    :   "F"
+}

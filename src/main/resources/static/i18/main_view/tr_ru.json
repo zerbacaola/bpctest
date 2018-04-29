@@ -1,0 +1,9 @@
+{
+    "NAME"      :   "Имя",
+    "GENDER"    :   "Пол",
+    "FATHER"    :   "Отец",
+    "MOTHER"    :   "Мать",
+    "CHILDRENS" :   "Дети",
+    "MALE"      :   "М",
+    "FEMALE"    :   "Ж"
+}

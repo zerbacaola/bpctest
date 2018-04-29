@@ -1,0 +1,7 @@
+{
+	"name": "Sergey",
+	"gender": "MALE",
+	"childrens": ["Pauline", "Katya"],
+	"mother": "Natasha",
+	"father": null
+}

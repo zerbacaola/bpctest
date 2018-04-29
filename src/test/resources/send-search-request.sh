@@ -1,0 +1,1 @@
+curl -H 'Content-Type: application/json' -d @request.json http://localhost:8080/search
