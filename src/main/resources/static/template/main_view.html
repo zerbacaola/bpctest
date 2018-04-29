@@ -16,19 +16,26 @@
                             <th>{{ 'CHILDRENS' | translate }}</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr ng-repeat="(key, person) in displayedData">
-                            <td>{{ person.name }}</td>
-                            <td>{{ person.gender | translate }}</td>
-                            <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
-                            <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
-                            <td>{{ getPersonNamesByIds(person.childs) }}</td>
-                        </tr>
+                        <tbody ng-show="state.isLoading">
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="loader"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="!state.isLoading">
+                            <tr ng-repeat="(key, person) in displayedData">
+                                <td>{{ person.name }}</td>
+                                <td>{{ person.gender | translate }}</td>
+                                <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
+                                <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
+                                <td>{{ getPersonNamesByIds(person.childs) }}</td>
+                            </tr>
                         </tbody>
                         <tfoot>
                             <tr>
                                 <td colspan="5" class="text-center">
-                                    <div st-pagination="" st-items-by-page="settings.itemsByPage" st-displayed-pages="settings.displayedPages"></div>
+                                    <div st-pagination="" st-page-change="pageChanged(newPage)" st-items-by-page="settings.itemsByPage" st-displayed-pages="settings.displayedPages"></div>
                                 </td>
                             </tr>
                         </tfoot>
