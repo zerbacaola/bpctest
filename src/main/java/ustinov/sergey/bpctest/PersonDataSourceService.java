@@ -18,10 +18,10 @@ public class PersonDataSourceService {
         List<PersonTO> result = new ArrayList<>();
 
 
-        PersonTO p1 = new PersonTO(1, "Петр", MALE, new byte[]{0xF, 0xF, 0xF, 0xF});
-        PersonTO p2 = new PersonTO(2, "Тамара", FEMALE, new byte[]{0xF, 0xF, 0xF, 0xF});
-        PersonTO p3 = new PersonTO(3, "Иван", MALE, new byte[]{0xF, 0xF, 0xF, 0xF});
-        PersonTO p4 = new PersonTO(4, "Ольга", FEMALE, new byte[]{0xF, 0xF, 0xF, 0xF});
+        PersonTO p1 = new PersonTO(1, "Петр", MALE);
+        PersonTO p2 = new PersonTO(2, "Тамара", FEMALE);
+        PersonTO p3 = new PersonTO(3, "Иван", MALE);
+        PersonTO p4 = new PersonTO(4, "Ольга", FEMALE);
 
         p1.getParents().put(MALE, p3.getId());
         p1.getParents().put(FEMALE, p4.getId());
@@ -36,5 +36,13 @@ public class PersonDataSourceService {
         ));
 
         return result;
+    }
+
+    //TODO : implement persistence
+    public byte[] getPhoto(long personId) {
+        if (personId % 2 == 0) {
+            return PhotoDataProvider.photo;
+        }
+        return new byte[]{};
     }
 }

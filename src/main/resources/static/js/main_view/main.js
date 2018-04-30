@@ -33,3 +33,8 @@ mainModule.config(['$translateProvider', function ($translateProvider) {
         .useSanitizeValueStrategy('escape');
     }]
 );
+
+mainModule.config(['$compileProvider', function ($compileProvider) {
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|ftp|blob):|data:image\//);
+    }]
+);

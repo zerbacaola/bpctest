@@ -7,6 +7,19 @@
     height: 250px;
 }
 
+.bpc-photo-block>span {
+    font-size: 4em;
+    color: #d3d3d3;
+}
+
+.bpc-table-block tbody>tr {
+    cursor: pointer;
+}
+
+.st-selected {
+    background : #d3d3d3;
+}
+
 .bpc-search-block table>tfoot div>button:last-of-type {
     position: static;
 }

@@ -7,6 +7,7 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
         }
     };
 
+    //TODO : implement basic response handler
     var searchByFilter = function(filter) {
         $scope.state.isLoading = true;
         PersonService.searchByFilter(filter).then(function(response) {
@@ -24,10 +25,21 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
         });
     };
 
-    $scope.image = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+    var fetchPersonPhoto = function(id) {
+        $scope.state.isLoading = true;
+        PersonService.getPhotoByPersonId(id).then(function(response) {
+            if (response.result === 'OK') {
+                $scope.photos[id] = response.data;
+                $scope.state.isLoading = false;
+            } else {
+                // TODO : Implement error modal
+            }
+        });
+    };
 
     $scope.data = [];
     $scope.displayedData = [];
+    $scope.photos = {};
     $scope.filter = {
         "name": null,
         "gender": null,
@@ -38,7 +50,8 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
 
     $scope.state = {
         isLoading : false,
-        currentPage : 1
+        currentPage : 1,
+        selectedPersonId : undefined
     };
 
     $scope.settings = {
@@ -52,6 +65,22 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
         filter['page'] = $scope.state.currentPage;
         filter['rowsPerPage'] = $scope.settings.itemsPerPage;
         searchByFilter(filter);
+    };
+
+    $scope.isPhotoExist = function() {
+        var id = $scope.state.selectedPersonId;
+        return angular.isDefined(id) && angular.isDefined($scope.photos[id]);
+    };
+
+    $scope.performPhotoSelected = function() {
+        var id = $scope.state.selectedPersonId;
+        if (!$scope.isPhotoExist() && angular.isDefined(id)) {
+            fetchPersonPhoto(id);
+        }
+    };
+
+    $scope.getPhotoData = function() {
+        return $scope.photos[$scope.state.selectedPersonId];
     };
 
     $scope.performReset = function() {
@@ -92,6 +121,24 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
         }
     };
 
+    $scope.$watch('stController', function(newValue, oldValue) {
+        if (!angular.isUndefined(newValue) && newValue !== oldValue) {
+            var stSelect = $scope.stController.select;
+            $scope.stController.select = function(rowObj, mode) {
+                console.log('Selected: ' + rowObj.isSelected + ', id: ' + rowObj.id);
+                stSelect(rowObj, mode);
+            };
+        }
+    });
+
+    $scope.$watch('state.selectedPersonId', function(newValue, oldValue) {
+        if (angular.isDefined(newValue) && newValue !== oldValue) {
+            $scope.performPhotoSelected();
+        }
+    });
+
+    /** ========================================== EVENT HANDLERS =================================================== */
+
     // Handler of 'items per page change' events
     $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
@@ -106,35 +153,18 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     $scope.pageChanged = function(newPage) {
         if (newPage !== $scope.state.currentPage) {
             $scope.state.currentPage = newPage;
+            $scope.state.selectedPersonId = undefined;
             $scope.performSearch();
         }
     };
 
-    // var changeTableState = function() {
-    //     if (!angular.isUndefined(tableController)) {
-    //         var state = tableController.tableState();
-    //         state.pagination.totalItemCount = $scope.data.length;
-    //         state.pagination.numberOfPages = $scope.state.totalPages;
-    //         state.pagination.start = ($scope.state.currentPage - 1) * $scope.settings.itemsByPage;
-    //         tableController.pipe();
-    //     }
-    // };
+    // Handler of 'row selected' events
+    $scope.onRowSelected = function(rowObj, mode) {
+        if (angular.isDefined(rowObj) && rowObj['isSelected'] === true && mode === 'single') {
+            $scope.state.selectedPersonId = rowObj.id;
+        }
+    };
 
-    // $scope.$watch('tableController', function(newValue, oldValue) {
-    //     if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-    //         $scope.tableController.pipe = function() {
-    //             $scope.tableController.pipe();
-    //         };
-    //     }
-    // });
-
-    // $scope.pipe = function(tableState, pipeFn) {
-    //     if (tableState.pagination.start !== $scope.state.start) {
-    //         $scope.state.start = tableState.pagination.start;
-    //
-    //     }
-    //     pipeFn();
-    // };
-
+    // Initial data load
     $scope.performSearch();
 });

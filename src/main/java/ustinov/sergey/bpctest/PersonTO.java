@@ -10,21 +10,19 @@ public class PersonTO {
     private long id;
     private String name;
     private Gender gender;
-    private byte[] photo;
     private Map<Gender, Long> parents = new HashMap<>();
     private List<Long> childs = new ArrayList<>();
 
-    public PersonTO(long id, String name, Gender gender, byte[] photo, Map<Gender, Long> parents, List<Long> childs) {
-        this(id, name, gender, photo);
+    public PersonTO(long id, String name, Gender gender, Map<Gender, Long> parents, List<Long> childs) {
+        this(id, name, gender);
         this.parents = parents;
         this.childs = childs;
     }
 
-    public PersonTO(long id, String name, Gender gender, byte[] photo) {
+    public PersonTO(long id, String name, Gender gender) {
         this.id = id;
         this.name = name;
         this.gender = gender;
-        this.photo = photo;
     }
 
     public long getId() {
@@ -49,14 +47,6 @@ public class PersonTO {
 
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
     }
 
     public Map<Gender, Long> getParents() {
