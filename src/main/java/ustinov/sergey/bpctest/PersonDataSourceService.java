@@ -13,10 +13,10 @@ import static ustinov.sergey.bpctest.Gender.MALE;
 
 @Repository
 public class PersonDataSourceService {
-
     // TODO : implement persistence
-    public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull List<String> childrens, int page, int rowsQuantity) {
+    public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int page, int rowsQuantity) {
         List<PersonTO> result = new ArrayList<>();
+
 
         PersonTO p1 = new PersonTO(1, "Петр", MALE, new byte[]{0xF, 0xF, 0xF, 0xF});
         PersonTO p2 = new PersonTO(2, "Тамара", FEMALE, new byte[]{0xF, 0xF, 0xF, 0xF});

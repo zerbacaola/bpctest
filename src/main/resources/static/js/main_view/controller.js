@@ -7,32 +7,7 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
         }
     };
 
-    $scope.data = [];
-    $scope.displayedData = [];
-    $scope.filter = {
-        "name": "Sergey",
-        "gender": "MALE",
-        "childrens": ["Pauline", "Katya"],
-        "mother": "Natasha",
-        "father": null,
-        "page": 1,
-        "rowsPerPage": 3
-    };
-
-
-    $scope.state = {
-        isLoading : false,
-        //totalPages : 0,
-        //start : undefined,
-        currentPage : undefined
-    };
-
-    $scope.settings = {
-        displayedPages : 10,
-        itemsByPage : 3
-    };
-
-    $scope.searchByFilter = function(filter) {
+    var searchByFilter = function(filter) {
         $scope.state.isLoading = true;
         PersonService.searchByFilter(filter).then(function(response) {
             if (response.result === 'OK') {
@@ -47,6 +22,44 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
                 // TODO : Implement error modal
             }
         });
+    };
+
+    $scope.image = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+
+    $scope.data = [];
+    $scope.displayedData = [];
+    $scope.filter = {
+        "name": null,
+        "gender": null,
+        "child": null,
+        "mother": null,
+        "father": null
+    };
+
+    $scope.state = {
+        isLoading : false,
+        currentPage : 1
+    };
+
+    $scope.settings = {
+        displayedPages : 10,
+        itemsPerPage : 2,
+        itemsPerPageOptions: [3, 4, 5, 10, 20, 30, 40, 50, 100]
+    };
+
+    $scope.performSearch = function() {
+        var filter = angular.copy($scope.filter);
+        filter['page'] = $scope.state.currentPage;
+        filter['rowsPerPage'] = $scope.settings.itemsPerPage;
+        searchByFilter(filter);
+    };
+
+    $scope.performReset = function() {
+        for (var i in $scope.filter) {
+            if ($scope.filter.hasOwnProperty(i)) {
+                $scope.filter[i] = null;
+            }
+        }
     };
 
     $scope.getPersonNameById = function(id) {
@@ -80,9 +93,12 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     };
 
     // Handler of 'items per page change' events
-    $scope.$watch('settings.itemsByPage', function(newValue, oldValue) {
+    $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            $scope.searchByFilter($scope.filter);
+            if ($scope.settings.itemsPerPage > $scope.data.length) {
+                // TODO : if there are no records found then decrease itemsPerPage value
+                $scope.performSearch();
+            }
         }
     });
 
@@ -90,7 +106,7 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     $scope.pageChanged = function(newPage) {
         if (newPage !== $scope.state.currentPage) {
             $scope.state.currentPage = newPage;
-            $scope.searchByFilter($scope.filter);
+            $scope.performSearch();
         }
     };
 
@@ -120,5 +136,5 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     //     pipeFn();
     // };
 
-    $scope.searchByFilter($scope.filter);
+    $scope.performSearch();
 });

@@ -1,13 +1,37 @@
-<div class="container" ng-controller="PersonController">
+<div class="container" >
     <div class="row bpc-empty">
+
         <div class="col-md-6 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
-                    <p>{{ 'APPLICATION_TITLE' | translate }}</p>
+                    <div class="">
+                        <p>{{ 'APPLICATION_TITLE' | translate }}</p>
+                    </div>
+                    <div class="">
+                        <select ng-model="settings.itemsPerPage" ng-options="p for p in settings.itemsPerPageOptions"></select>
+                    </div>
                 </div>
                 <div class="panel-body">
                     <table st-table="displayedData" st-safe-src="data" class="table table-sm">
-                        <thead class="thead-dark">
+                        <thead>
+                        <!-- TODO: implement filtering of results -->
+                        <!--tr>
+                            <th>
+                                <input st-search="name" class="input-sm form-control" type="search"/>
+                            </th>
+                            <th>
+                                <input st-search="gender" class="input-sm form-control" type="search"/>
+                            </th>
+                            <th>
+                                <input st-search="father" class="input-sm form-control" type="search"/>
+                            </th>
+                            <th>
+                                <input st-search="mother" class="input-sm form-control" type="search"/>
+                            </th>
+                            <th>
+                                <input st-search="childs" class="input-sm form-control" type="search"/>
+                            </th>
+                        </tr-->
                         <tr>
                             <th>{{ 'NAME' | translate }}</th>
                             <th>{{ 'GENDER' | translate }}</th>
@@ -32,10 +56,10 @@
                                 <td>{{ getPersonNamesByIds(person.childs) }}</td>
                             </tr>
                         </tbody>
-                        <tfoot>
+                        <tfoot ng-show="!state.isLoading">
                             <tr>
                                 <td colspan="5" class="text-center">
-                                    <div st-pagination="" st-page-change="pageChanged(newPage)" st-items-by-page="settings.itemsByPage" st-displayed-pages="settings.displayedPages"></div>
+                                    <div st-pagination="" st-page-change="pageChanged(newPage)" st-items-by-page="settings.itemsPerPage" st-displayed-pages="settings.displayedPages"></div>
                                 </td>
                             </tr>
                         </tfoot>
@@ -43,15 +67,63 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+
+
+        <div class="panel-group col-md-4">
+
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
                     <p>{{ 'PHOTO' | translate }}</p>
                 </div>
-                <div class="panel-body">
-
+                <div class="panel-body bpc-photo-block">
+                    <img ng-src="data:image/JPEG;base64, {{image}}">
                 </div>
             </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <p>{{ 'SEARCH' | translate }}</p>
+                </div>
+                <div class="panel-body bpc-search-block">
+                    <table class="table table-sm borderless">
+                        <thead></thead>
+                        <tbody ng-show="!state.isLoading"><!-- TODO : unblock UI when error ocurred -->
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_NAME' | translate }}" ng-model="filter.name" ng-trim="true">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_MOTHER' | translate }}" ng-model="filter.mother" ng-trim="true">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_CHILD' | translate }}" ng-model="filter.child" ng-trim="true">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_FATHER' | translate }}" ng-model="filter.father" ng-trim="true">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_GENDER' | translate }}" ng-model="filter.gender" ng-trim="true">
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot ng-show="!state.isLoading">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-primary" ng-click="performSearch()">{{ 'FIND' | translate }}</button>
+                                        <button type="button" class="btn btn-default" ng-click="performReset()">{{ 'RESET' | translate }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
     </div>

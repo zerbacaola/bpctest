@@ -1,11 +1,19 @@
 {
-    "NAME"              :   "Имя",
-    "GENDER"            :   "Пол",
-    "FATHER"            :   "Отец",
-    "MOTHER"            :   "Мать",
-    "CHILDRENS"         :   "Дети",
-    "MALE"              :   "М",
-    "FEMALE"            :   "Ж",
-    "APPLICATION_TITLE" :   "Просмотр сведений о клиентах",
-    "PHOTO"             :   "Фото"
+    "NAME"                  :   "Имя",
+    "GENDER"                :   "Пол",
+    "FATHER"                :   "Отец",
+    "MOTHER"                :   "Мать",
+    "CHILDRENS"             :   "Дети",
+    "MALE"                  :   "М",
+    "FEMALE"                :   "Ж",
+    "APPLICATION_TITLE"     :   "Просмотр сведений о клиентах",
+    "PHOTO"                 :   "Фото",
+    "SEARCH"                :   "Критерии поиска",
+    "FIND"                  :   "Искать",
+    "SEARCH_BY_NAME"        :   "Имя",
+    "SEARCH_BY_GENDER"      :   "Пол",
+    "SEARCH_BY_MOTHER"      :   "Мать",
+    "SEARCH_BY_FATHER"      :   "Отец",
+    "SEARCH_BY_CHILD"       :   "Ребенок",
+    "RESET"                 :   "Очистить"
 }

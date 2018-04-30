@@ -1,11 +1,9 @@
 package ustinov.sergey.bpctest;
 
-import java.util.List;
-
 public class PersonFilterTO {
     private String name;
-    private Gender gender;
-    private List<String> childrens;
+    private String gender;
+    private String child;
     private String mother;
     private String father;
     private int page;
@@ -19,20 +17,20 @@ public class PersonFilterTO {
         this.name = name;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public List<String> getChildrens() {
-        return childrens;
+    public String getChild() {
+        return child;
     }
 
-    public void setChildrens(List<String> childrens) {
-        this.childrens = childrens;
+    public void setChild(String child) {
+        this.child = child;
     }
 
     public String getMother() {
@@ -71,8 +69,8 @@ public class PersonFilterTO {
     public String toString() {
         return "PersonFilterTO{" +
                 "name='" + name + '\'' +
-                ", gender=" + gender +
-                ", childrens=" + childrens +
+                ", gender='" + gender + '\'' +
+                ", child='" + child + '\'' +
                 ", mother='" + mother + '\'' +
                 ", father='" + father + '\'' +
                 ", page=" + page +

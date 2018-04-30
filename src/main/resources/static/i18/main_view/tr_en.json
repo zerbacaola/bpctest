@@ -1,11 +1,19 @@
 {
-    "NAME"              :   "Name",
-    "GENDER"            :   "Gender",
-    "FATHER"            :   "Father",
-    "MOTHER"            :   "Mother",
-    "CHILDRENS"         :   "Childrens",
-    "MALE"              :   "M",
-    "FEMALE"            :   "F",
-    "APPLICATION_TITLE" :   "Viewing customer information",
-    "PHOTO"             :   "Photo"
+    "NAME"                  :   "Name",
+    "GENDER"                :   "Gender",
+    "FATHER"                :   "Father",
+    "MOTHER"                :   "Mother",
+    "CHILDRENS"             :   "Childrens",
+    "MALE"                  :   "M",
+    "FEMALE"                :   "F",
+    "APPLICATION_TITLE"     :   "Viewing customer information",
+    "PHOTO"                 :   "Photo",
+    "SEARCH"                :   "Search criterias",
+    "FIND"                  :   "Find",
+    "SEARCH_BY_NAME"        :   "Name",
+    "SEARCH_BY_GENDER"      :   "Gender",
+    "SEARCH_BY_MOTHER"      :   "Mother",
+    "SEARCH_BY_FATHER"      :   "Father",
+    "SEARCH_BY_CHILD"       :   "Child",
+    "RESET"                 :   "Reset"
 }
