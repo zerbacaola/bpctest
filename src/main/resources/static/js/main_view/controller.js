@@ -67,7 +67,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     $scope.settings = {
         displayedPages : 10,
         itemsPerPage : 1,
-        itemsPerPageOptions : [10, 20, 30, 40, 50, 100],
+        itemsPerPageOptions : [1, 3, 10, 20, 30, 40, 50, 100],
         genderOptions : genderOptions
     };
 
@@ -171,7 +171,10 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     };
 
     // Handler of 'row selected' events
-    $scope.onRowSelected = function(rowObj, mode) {
+    $scope.onRowSelected = function(rowObj, mode, commonFn, stController) {
+        delete arguments[--arguments.length];
+        delete arguments[--arguments.length];
+        commonFn.apply(stController, arguments);
         if (angular.isDefined(rowObj) && rowObj['isSelected'] === true && mode === 'single') {
             $scope.state.selectedPersonId = rowObj.id;
         }
