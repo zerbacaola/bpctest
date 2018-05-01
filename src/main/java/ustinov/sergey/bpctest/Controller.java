@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static ustinov.sergey.bpctest.SafeGetter.EMPTY;
 
 @RestController
@@ -47,9 +48,10 @@ public class Controller {
     public JsonResult<String> getPhotoByPersonId(@RequestParam String id) {
         try {
             byte[] rawData = facade.getPhoto(id);
-            return new JsonResult<>(
-                Base64.getEncoder().encodeToString(rawData)
-            );
+            String photo = ofNullable(rawData)
+                .map(d -> Base64.getEncoder().encodeToString(d))
+                .orElse(null);
+            return new JsonResult<>(photo);
         } catch (Exception e) {
             log.error(format("Error occurred during fetching person photo. PersonId: %s", id), e);
             return new JsonResult<>(

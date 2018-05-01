@@ -1,8 +1,18 @@
 'use strict';
 
-mainModule.controller('PersonController', function ($scope, PersonService) {
+mainModule.controller('PersonController', function ($scope, $translate, PersonService) {
+    var genderOptions = [
+        { k : null,      v : '' },
+        { k : 'MALE',    v : $translate.instant('MALE') },
+        { k : 'FEMALE',  v : $translate.instant('FEMALE') }
+    ];
+
+    var isDefined = function(v) {
+        return angular.isDefined(v) && v != null;
+    };
+
     var process = function(person) {
-        if (!angular.isUndefined(person)) {
+        if (isDefined(person)) {
             $scope.data.push(person);
         }
     };
@@ -42,7 +52,7 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     $scope.photos = {};
     $scope.filter = {
         "name": null,
-        "gender": null,
+        "gender": genderOptions[0],
         "child": null,
         "mother": null,
         "father": null
@@ -56,25 +66,27 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
 
     $scope.settings = {
         displayedPages : 10,
-        itemsPerPage : 2,
-        itemsPerPageOptions: [3, 4, 5, 10, 20, 30, 40, 50, 100]
+        itemsPerPage : 1,
+        itemsPerPageOptions : [10, 20, 30, 40, 50, 100],
+        genderOptions : genderOptions
     };
 
     $scope.performSearch = function() {
         var filter = angular.copy($scope.filter);
         filter['page'] = $scope.state.currentPage;
         filter['rowsPerPage'] = $scope.settings.itemsPerPage;
+        filter['gender'] = $scope.filter['gender']['k'];
         searchByFilter(filter);
     };
 
     $scope.isPhotoExist = function() {
         var id = $scope.state.selectedPersonId;
-        return angular.isDefined(id) && angular.isDefined($scope.photos[id]);
+        return isDefined(id) && isDefined($scope.photos[id]);
     };
 
     $scope.performPhotoSelected = function() {
         var id = $scope.state.selectedPersonId;
-        if (!$scope.isPhotoExist() && angular.isDefined(id)) {
+        if (!$scope.isPhotoExist() && isDefined(id)) {
             fetchPersonPhoto(id);
         }
     };
@@ -86,13 +98,13 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     $scope.performReset = function() {
         for (var i in $scope.filter) {
             if ($scope.filter.hasOwnProperty(i)) {
-                $scope.filter[i] = null;
+                $scope.filter[i] = (i === 'gender') ? genderOptions[0] : null;
             }
         }
     };
 
     $scope.getPersonNameById = function(id) {
-        if (!angular.isUndefined(id) && !angular.isUndefined($scope.data)) {
+        if (angular.isDefined(id) && angular.isDefined($scope.data)) {
             for (var i in $scope.data) {
                 if ($scope.data.hasOwnProperty(i)) {
                     if ($scope.data[i].id === id) {
@@ -105,7 +117,7 @@ mainModule.controller('PersonController', function ($scope, PersonService) {
     };
 
     $scope.getPersonNamesByIds = function(ids) {
-        if (!angular.isUndefined(ids) && angular.isArray(ids)) {
+        if (angular.isDefined(ids) && angular.isArray(ids)) {
             var names = [];
             for (var index in ids) {
                 if (ids.hasOwnProperty(index)) {

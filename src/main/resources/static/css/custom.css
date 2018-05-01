@@ -1,5 +1,5 @@
 .bpc-empty {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .bpc-photo-block,
@@ -7,9 +7,17 @@
     height: 250px;
 }
 
+.bpc-panel-heading p {
+    height: 34px;
+}
+
 .bpc-photo-block>span {
     font-size: 4em;
     color: #d3d3d3;
+}
+
+.bpc-table-block {
+    height: 577px;
 }
 
 .bpc-table-block tbody>tr {
@@ -26,11 +34,6 @@
 
 .bpc-search-block table>tfoot div>button:first-of-type {
     width: 225px;
-}
-
-select {
-    left : 45%;
-    position: relative;
 }
 
 table.borderless>tbody>tr>td {

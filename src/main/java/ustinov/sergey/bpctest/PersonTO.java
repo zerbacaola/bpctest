@@ -1,11 +1,30 @@
 package ustinov.sergey.bpctest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Function;
+
+import static java.util.Optional.ofNullable;
+import static ustinov.sergey.bpctest.Gender.FEMALE;
+import static ustinov.sergey.bpctest.Gender.MALE;
 
 public class PersonTO {
+
+    public static final Function<Object[], PersonTO> TRANSFORMER = array -> {
+        final Map<Gender, Long> parents = new HashMap<>();
+        PersonTO p = new PersonTO(
+            ((Integer) array[0]).longValue(),
+            (String) array[1],
+            Gender.parse((String) array[2]),
+            parents
+        );
+
+        ofNullable((Integer) array[3])
+            .map(Integer::longValue).ifPresent(id -> parents.put(FEMALE, id));
+        ofNullable((Integer) array[4])
+            .map(Integer::longValue).ifPresent(id -> parents.put(MALE, id));
+        return p;
+    };
 
     private long id;
     private String name;
@@ -13,10 +32,9 @@ public class PersonTO {
     private Map<Gender, Long> parents = new HashMap<>();
     private List<Long> childs = new ArrayList<>();
 
-    public PersonTO(long id, String name, Gender gender, Map<Gender, Long> parents, List<Long> childs) {
+    public PersonTO(long id, String name, Gender gender, Map<Gender, Long> parents) {
         this(id, name, gender);
         this.parents = parents;
-        this.childs = childs;
     }
 
     public PersonTO(long id, String name, Gender gender) {
@@ -63,5 +81,9 @@ public class PersonTO {
 
     public void setChilds(List<Long> childs) {
         this.childs = childs;
+    }
+
+    public boolean isGrandParent() {
+        return ofNullable(parents).map(Map::isEmpty).orElse(true);
     }
 }

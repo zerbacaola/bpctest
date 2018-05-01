@@ -4,11 +4,13 @@
         <div class="col-md-6 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
-                    <div class="">
-                        <p>{{ 'APPLICATION_TITLE' | translate }}</p>
-                    </div>
-                    <div class="">
-                        <select ng-model="settings.itemsPerPage" ng-options="p for p in settings.itemsPerPageOptions"></select>
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <p class="panel-title">{{ 'APPLICATION_TITLE' | translate }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" ng-model="settings.itemsPerPage" ng-options="p for p in settings.itemsPerPageOptions"></select>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body bpc-table-block">
@@ -68,12 +70,14 @@
             </div>
         </div>
 
-
-        <div class="panel-group col-md-4">
-
+        <div class="col-md-4">
             <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    <p>{{ 'PHOTO' | translate }}</p>
+                <div class="panel-heading bpc-panel-heading text-center">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="panel-title">{{ 'PHOTO' | translate }}</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel-body bpc-photo-block text-center">
                     <span ng-show="!isPhotoExist()" class="glyphicon glyphicon-ban-circle"></span>
@@ -82,8 +86,12 @@
             </div>
 
             <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    <p>{{ 'SEARCH' | translate }}</p>
+                <div class="panel-heading bpc-panel-heading text-center">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="panel-title">{{ 'SEARCH' | translate }}</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel-body bpc-search-block">
                     <table class="table table-sm borderless">
@@ -107,7 +115,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="text" class="form-control" placeholder="{{ 'SEARCH_BY_GENDER' | translate }}" ng-model="filter.gender" ng-trim="true">
+                                    <select class="form-control" ng-model="filter.gender" ng-options="obj as obj.v for obj in settings.genderOptions track by obj.k"></select>
                                 </td>
                             </tr>
                         </tbody>

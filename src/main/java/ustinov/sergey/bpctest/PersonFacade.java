@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
 
@@ -17,14 +18,9 @@ import static java.util.Optional.ofNullable;
  */
 @Service
 public class PersonFacade {
-    @Autowired
-    private PersonDataSourceService personDao;
-
     private Logger log = LoggerFactory.getLogger(getClass());
 
-    private static final int ROWS_PER_PAGE = 5;
-    private static final byte[] EMPTY_BYTE_ARRAY = new byte[]{};
-
+    private static final int ROWS_PER_PAGE = 10;
     private static final Function<PersonFilterTO, Gender> parseGender = o -> {
         try {
             return ofNullable(o.getGender())
@@ -40,14 +36,19 @@ public class PersonFacade {
             return null;
         }
     };
+    private static final Predicate<Integer> nonNegative = o -> o > 0;
 
+    @Autowired
+    private PersonDataSourceService personDao;
+
+    @Nullable
     public byte[] getPhoto(@Nullable String id) {
         // TODO : tune logging system
         log.debug("getPhoto: {}", id);
 
         Long personId = new SafeGetter<>(id).get(parseLong, null);
-        return personId != null ?
-            personDao.getPhoto(personId) : EMPTY_BYTE_ARRAY;
+        return ofNullable(personId)
+            .map(personDao::getPhoto).orElse(null);
     }
 
     public List<PersonTO> search(@Nullable PersonFilterTO filter) {
@@ -61,8 +62,8 @@ public class PersonFacade {
             s.get(PersonFilterTO::getMother),
             s.get(PersonFilterTO::getFather),
             s.get(PersonFilterTO::getChild),
-            s.get(PersonFilterTO::getPage, 1),
-            s.get(PersonFilterTO::getRowsPerPage, ROWS_PER_PAGE)
+            s.get(PersonFilterTO::getPage, nonNegative, 1),
+            s.get(PersonFilterTO::getRowsPerPage, nonNegative, ROWS_PER_PAGE)
         );
     }
 }
