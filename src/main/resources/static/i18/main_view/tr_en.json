@@ -15,5 +15,6 @@
     "SEARCH_BY_MOTHER"      :   "Mother",
     "SEARCH_BY_FATHER"      :   "Father",
     "SEARCH_BY_CHILD"       :   "Child",
-    "RESET"                 :   "Reset"
+    "RESET"                 :   "Reset",
+    "PRESENT"               :   "[Present]"
 }

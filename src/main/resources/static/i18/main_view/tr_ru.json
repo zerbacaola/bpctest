@@ -15,5 +15,6 @@
     "SEARCH_BY_MOTHER"      :   "Мать",
     "SEARCH_BY_FATHER"      :   "Отец",
     "SEARCH_BY_CHILD"       :   "Ребенок",
-    "RESET"                 :   "Очистить"
+    "RESET"                 :   "Очистить",
+    "PRESENT"               :   "[Присутствует]"
 }

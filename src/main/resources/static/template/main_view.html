@@ -55,9 +55,9 @@
                             <tr st-select-row="person" ng-repeat="(key, person) in displayedData">
                                 <td>{{ person.name }}</td>
                                 <td>{{ person.gender | translate }}</td>
-                                <td>{{ getPersonNameById(person.parents['MALE']) }}</td>
-                                <td>{{ getPersonNameById(person.parents['FEMALE']) }}</td>
-                                <td>{{ getPersonNamesByIds(person.childs) }}</td>
+                                <td>{{ getPersonNameById(person.parents['MALE'], isObjectDefined(person.parents['MALE']) ) }}</td>
+                                <td>{{ getPersonNameById(person.parents['FEMALE'], isObjectDefined(person.parents['FEMALE'])) }}</td>
+                                <td>{{ getPersonNamesByIds(person.childs, '') }}</td>
                             </tr>
                         </tbody>
                         <tfoot ng-show="!state.isLoading">

@@ -19,17 +19,33 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         }
     };
 
-    var normalizeFilter = function(fetchCount) {
+    var normalizeFilter = function(offset, fetchCount) {
         var filter = angular.copy($scope.filter);
-        if (isDefined(fetchCount)) {
-            filter['offset'] = $scope.data.length;
-            filter['limit'] = fetchCount;
-        } else {
-            filter['offset'] = $scope.settings.itemsPerPage * ($scope.state.currentPage - 1);
-            filter['limit'] = $scope.settings.itemsPerPage;
-        }
+        filter['offset'] = offset;
+        filter['limit'] = fetchCount;
         filter['gender'] = $scope.filter['gender']['k'];
         return filter;
+    };
+
+    var postProcessing = function() {
+        // Resolve person relations
+        if (isDefined($scope.data)) {
+            for (var idx in $scope.data) {
+                if ($scope.data.hasOwnProperty(idx)) {
+                    var person = $scope.data[idx];
+                    if (isDefined(person)) {
+                        for (var g in person.parents) {
+                            if (person.parents.hasOwnProperty(g)) {
+                                var parent = $scope.getPersonById(person.parents[g]);
+                                if (isDefined(parent) && parent.childs.indexOf(person.id) === -1) {
+                                    parent.childs.push(person.id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     };
 
     //TODO : implement common response handler
@@ -49,6 +65,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
                     // This is for displaying the next page button
                     process(stub);
                 }
+                postProcessing();
             } else {
                 // TODO : Implement error modal
             }
@@ -66,7 +83,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         if (!$scope.state.dataFetched) {
             if (performCheckerFn()) {
                 var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
-                searchByFilter(normalizeFilter(fetchCount), false);
+                searchByFilter(normalizeFilter($scope.data.length, fetchCount), false);
             } else {
                 process(stub);
             }
@@ -129,25 +146,37 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         return $scope.photos[$scope.state.selectedPersonId];
     };
 
-    $scope.getPersonNameById = function(id) {
-        if (angular.isDefined(id) && angular.isDefined($scope.data)) {
+    $scope.getPersonById = function(id) {
+        if (isDefined(id) && isDefined($scope.data)) {
             for (var i in $scope.data) {
                 if ($scope.data.hasOwnProperty(i)) {
                     if ($scope.data[i].id === id) {
-                        return $scope.data[i].name;
+                        return $scope.data[i];
                     }
                 }
             }
         }
-        return '';
+        return undefined;
     };
 
-    $scope.getPersonNamesByIds = function(ids) {
-        if (angular.isDefined(ids) && angular.isArray(ids)) {
+    $scope.isObjectDefined = function(object) {
+        return isDefined(object) ? $translate.instant('PRESENT') : '';
+    };
+
+    $scope.getPersonNameById = function(id, def) {
+        var person = $scope.getPersonById(id);
+        if (isDefined(person)) {
+            return person.name;
+        }
+        return def;
+    };
+
+    $scope.getPersonNamesByIds = function(ids, def) {
+        if (isDefined(ids) && angular.isArray(ids)) {
             var names = [];
             for (var index in ids) {
                 if (ids.hasOwnProperty(index)) {
-                    var name = $scope.getPersonNameById(ids[index]);
+                    var name = $scope.getPersonNameById(ids[index], '');
                     if (name.length !== 0) {
                         names.push(name);
                     }
@@ -155,7 +184,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
             }
             return names.join(', ');
         } else {
-            return '';
+            return def;
         }
     };
 
@@ -191,7 +220,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     // Handler of 'search button was clicked' events
     $scope.performSearch = function() {
         $scope.state.dataFetched = false;
-        searchByFilter(normalizeFilter(undefined), true);
+        searchByFilter(normalizeFilter(0, $scope.settings.itemsPerPage), true);
     };
 
     // Handler of 'items per page change' events
