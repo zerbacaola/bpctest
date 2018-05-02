@@ -21,7 +21,7 @@ public class PersonTO {
 
         ofNullable((Integer) array[3])
             .map(Integer::longValue).ifPresent(id -> parents.put(FEMALE, id));
-        ofNullable((Integer) array[4])
+        ofNullable((Integer) array[5])
             .map(Integer::longValue).ifPresent(id -> parents.put(MALE, id));
         return p;
     };

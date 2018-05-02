@@ -33,33 +33,34 @@ public class PersonDataSourceService {
     @SuppressWarnings("unchecked")
     public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int offset, int limit) {
         List<Object[]> data = entityManager.createNativeQuery(
-            "WITH parents AS ( \n" +
-            "    SELECT \n" +
-            "      id, \n" +
-            "      name, \n" +
-            "      gender \n" +
-            "    FROM person p \n" +
-            "      LEFT JOIN person_parent r ON p.id = r.person_id \n" +
-            "    WHERE r.person_id IS NULL \n" +
-            ") \n" +
-            "SELECT person.id, person.name, person.gender, m.id AS mother_id, f.id AS father_id\n" +
-            "FROM person \n" +
-            "LEFT JOIN ( \n" +
-            "  SELECT o.id, r.person_id FROM parents o\n" +
-            "  JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'F'\n" +
-            "    WHERE (:dontFilterByMotherName OR o.name LIKE :motherName)\n" +
-            ") m ON person.id = m.person_id \n" +
-            "LEFT JOIN ( \n" +
-            "  SELECT o.id, r.person_id FROM parents o \n" +
-            "    JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'M'\n" +
-            "  WHERE (:dontFilterByFatherName OR o.name LIKE :fatherName)\n" +
-            ") f ON person.id = f.person_id\n" +
-            "\n" +
-            "WHERE (:dontFilterByGender OR person.gender = :gender)\n" +
-            "  AND (:dontFilterByName OR person.name LIKE :name)\n" +
-            "ORDER BY person.id ASC\n" +
-            "LIMIT :lim OFFSET :off"
-          )
+                "WITH parents AS ( \n" +
+                "    SELECT \n" +
+                "      id, \n" +
+                "      name, \n" +
+                "      gender \n" +
+                "    FROM person p \n" +
+                "      LEFT JOIN person_parent r ON p.id = r.person_id \n" +
+                "    WHERE r.person_id IS NULL \n" +
+                ") \n" +
+                "SELECT  person.id, person.name, person.gender,\n" +
+                "        m.id AS mother_id, m.name AS mother_name,\n" +
+                "        f.id AS father_id, f.name AS father_name\n" +
+                "FROM person \n" +
+                "LEFT JOIN (\n" +
+                "  SELECT o.id, r.person_id, o.name FROM parents o\n" +
+                "  JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'F'\n" +
+                ") m ON person.id = m.person_id \n" +
+                "LEFT JOIN (\n" +
+                "  SELECT o.id, r.person_id, o.name FROM parents o\n" +
+                "    JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'M'\n" +
+                ") f ON person.id = f.person_id \n" +
+                "WHERE (:dontFilterByGender OR person.gender = :gender)\n" +
+                "  AND (:dontFilterByName OR LOWER(person.name) LIKE LOWER(:name))\n" +
+                "  AND (:dontFilterByMotherName OR LOWER(m.name) LIKE LOWER(:motherName))\n" +
+                "  AND (:dontFilterByFatherName OR LOWER(f.name) LIKE LOWER(:fatherName)) \n" +
+                "ORDER BY person.id ASC \n" +
+                "LIMIT :lim OFFSET :off"
+           )
            .setParameter("dontFilterByGender", gender == null)
            .setParameter("gender", ofNullable(gender).map(Gender::getValue).orElse(EMPTY))
            .setParameter("dontFilterByName", name.isEmpty())
