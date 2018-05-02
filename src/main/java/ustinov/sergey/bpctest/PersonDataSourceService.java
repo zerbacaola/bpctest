@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,35 +31,42 @@ public class PersonDataSourceService {
     private EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int offset, int limit) {
+    public Collection<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int offset, int limit) {
         List<Object[]> data = entityManager.createNativeQuery(
-                "WITH parents AS ( \n" +
+                "WITH parents AS (\n" +
                 "    SELECT \n" +
                 "      id, \n" +
                 "      name, \n" +
-                "      gender \n" +
+                "      gender\n" +
                 "    FROM person p \n" +
                 "      LEFT JOIN person_parent r ON p.id = r.person_id \n" +
                 "    WHERE r.person_id IS NULL \n" +
-                ") \n" +
-                "SELECT  person.id, person.name, person.gender,\n" +
-                "        m.id AS mother_id, m.name AS mother_name,\n" +
-                "        f.id AS father_id, f.name AS father_name\n" +
-                "FROM person \n" +
-                "LEFT JOIN (\n" +
-                "  SELECT o.id, r.person_id, o.name FROM parents o\n" +
-                "  JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'F'\n" +
-                ") m ON person.id = m.person_id \n" +
-                "LEFT JOIN (\n" +
-                "  SELECT o.id, r.person_id, o.name FROM parents o\n" +
-                "    JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'M'\n" +
-                ") f ON person.id = f.person_id \n" +
-                "WHERE (:dontFilterByGender OR person.gender = :gender)\n" +
-                "  AND (:dontFilterByName OR LOWER(person.name) LIKE LOWER(:name))\n" +
-                "  AND (:dontFilterByMotherName OR LOWER(m.name) LIKE LOWER(:motherName))\n" +
-                "  AND (:dontFilterByFatherName OR LOWER(f.name) LIKE LOWER(:fatherName)) \n" +
-                "ORDER BY person.id ASC \n" +
-                "LIMIT :lim OFFSET :off"
+                "),\n" +
+                "parents_with_childrens AS (\n" +
+                "  SELECT  person.id, person.name, person.gender,\n" +
+                "          m.id AS mother_id, m.name AS mother_name,\n" +
+                "          f.id AS father_id, f.name AS father_name\n" +
+                "  FROM person\n" +
+                "  LEFT JOIN (\n" +
+                "    SELECT o.id, r.person_id, o.name FROM parents o\n" +
+                "    JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'F'\n" +
+                "  ) m ON person.id = m.person_id\n" +
+                "  LEFT JOIN (\n" +
+                "    SELECT o.id, r.person_id, o.name FROM parents o\n" +
+                "      JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'M'\n" +
+                "  ) f ON person.id = f.person_id\n" +
+                "  WHERE (:dontFilterByGender OR person.gender = :gender)\n" +
+                "    AND (:dontFilterByName OR LOWER(person.name) LIKE LOWER(:name))\n" +
+                "    AND (:dontFilterByMotherName OR LOWER(m.name) LIKE LOWER(:motherName))\n" +
+                "    AND (:dontFilterByFatherName OR LOWER(f.name) LIKE LOWER(:fatherName))\n" +
+                "  OFFSET :off LIMIT :lim\n" +
+                ")\n" +
+                "SELECT pc.*, ps.id AS child_id, ps.name AS child_name\n" +
+                "  FROM parents_with_childrens pc\n" +
+                "  LEFT JOIN person_parent pp ON pp.parent_id = pc.id\n" +
+                "  LEFT JOIN person ps ON ps.id = pp.person_id\n " +
+                "WHERE (:dontFilterByChildName OR LOWER(ps.name) LIKE LOWER(:childName))\n " +
+                "ORDER BY pc.id"
            )
            .setParameter("dontFilterByGender", gender == null)
            .setParameter("gender", ofNullable(gender).map(Gender::getValue).orElse(EMPTY))
@@ -69,31 +76,25 @@ public class PersonDataSourceService {
            .setParameter("motherName", wrap(mother))
            .setParameter("dontFilterByFatherName", father.isEmpty())
            .setParameter("fatherName", wrap(father))
+           .setParameter("dontFilterByChildName", child.isEmpty())
+           .setParameter("childName", wrap(child))
            .setParameter("lim", limit)
            .setParameter("off", offset)
            .getResultList();
 
-
         List<PersonTO> personTOs = data.stream().map(TRANSFORMER)
             .collect(Collectors.toList());
 
-        final Map<Long, PersonTO> parentsTOs = personTOs.stream()
-            .filter(PersonTO::isGrandParent)
+        Map<Long, PersonTO> personTOsMapper = personTOs.stream()
             .collect(Collectors.toMap(
-                PersonTO::getId, Function.identity()
+                PersonTO::getId, Function.identity(),
+                (p1, p2) -> {
+                    p1.getChilds().addAll(p2.getChilds());
+                    return p1;
+                }
             ));
 
-        // Enrich results
-        List<PersonTO> childsTOs = new ArrayList<>(personTOs);
-        childsTOs.removeAll(parentsTOs.values());
-        childsTOs.forEach(c -> {
-            for (Long parentId : c.getParents().values()) {
-                ofNullable(parentsTOs.get(parentId)).map(
-                    p -> p.getChilds().add(c.getId())
-                );
-            }
-        });
-        return personTOs;
+        return personTOsMapper.values();
     }
 
     @Nullable

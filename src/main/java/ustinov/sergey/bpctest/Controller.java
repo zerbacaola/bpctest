@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -27,7 +27,7 @@ public class Controller {
         produces = "application/json",
         consumes = "application/json"
     )
-    public JsonResult<List<PersonTO>> searchByfilter(@RequestBody @Valid PersonFilterTO filter) {
+    public JsonResult<Collection<PersonTO>> searchByfilter(@RequestBody @Valid PersonFilterTO filter) {
         try {
             return new JsonResult<>(facade.search(filter));
         } catch (Exception e) {

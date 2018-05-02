@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -50,7 +50,7 @@ public class PersonFacade {
             .map(personDao::getPhoto).orElse(null);
     }
 
-    public List<PersonTO> search(@Nullable PersonFilterTO filter) {
+    public Collection<PersonTO> search(@Nullable PersonFilterTO filter) {
         SafeGetter<PersonFilterTO> s = new SafeGetter<>(filter);
 
         log.debug("{}", filter);

@@ -27,27 +27,6 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         return filter;
     };
 
-    var postProcessing = function() {
-        // Resolve person relations
-        if (isDefined($scope.data)) {
-            for (var idx in $scope.data) {
-                if ($scope.data.hasOwnProperty(idx)) {
-                    var person = $scope.data[idx];
-                    if (isDefined(person)) {
-                        for (var g in person.parents) {
-                            if (person.parents.hasOwnProperty(g)) {
-                                var parent = $scope.getPersonById(person.parents[g]);
-                                if (isDefined(parent) && parent.childs.indexOf(person.id) === -1) {
-                                    parent.childs.push(person.id);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
-
     //TODO : implement common response handler
     var searchByFilter = function(filter, erasePreviousData) {
         $scope.state.isLoading = true;
@@ -65,7 +44,6 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
                     // This is for displaying the next page button
                     process(stub);
                 }
-                postProcessing();
             } else {
                 // TODO : Implement error modal
             }
@@ -146,46 +124,18 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         return $scope.photos[$scope.state.selectedPersonId];
     };
 
-    $scope.getPersonById = function(id) {
-        if (isDefined(id) && isDefined($scope.data)) {
-            for (var i in $scope.data) {
-                if ($scope.data.hasOwnProperty(i)) {
-                    if ($scope.data[i].id === id) {
-                        return $scope.data[i];
-                    }
-                }
-            }
-        }
-        return undefined;
-    };
-
-    $scope.isObjectDefined = function(object) {
-        return isDefined(object) ? $translate.instant('PRESENT') : '';
-    };
-
-    $scope.getPersonNameById = function(id, def) {
-        var person = $scope.getPersonById(id);
-        if (isDefined(person)) {
-            return person.name;
-        }
-        return def;
-    };
-
-    $scope.getPersonNamesByIds = function(ids, def) {
-        if (isDefined(ids) && angular.isArray(ids)) {
-            var names = [];
-            for (var index in ids) {
-                if (ids.hasOwnProperty(index)) {
-                    var name = $scope.getPersonNameById(ids[index], '');
-                    if (name.length !== 0) {
-                        names.push(name);
-                    }
+    $scope.getPersonNames = function(array) {
+        var names = [];
+        if (isDefined(array)) {
+            for (var o in array) {
+                if (array.hasOwnProperty(o)) {
+                    var name = isDefined(array[o].name) ? array[o].name : '';
+                    names.push(name);
                 }
             }
             return names.join(', ');
-        } else {
-            return def;
         }
+        return names;
     };
 
     $scope.$watch('state.selectedPersonId', function(newValue, oldValue) {
@@ -198,7 +148,6 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         delete arguments[--arguments.length];
         delete arguments[--arguments.length];
         var tableState = commonFn.apply(stController, arguments);
-        //console.log('totalItemCount: ' + tableState.pagination.totalItemCount + ' start: ' + tableState.pagination.start + ' number: ' + tableState.pagination.number + ' STUB: ' + $scope.state.stubIsPresent);
 
         if (!isDefined($scope.state.tableState)) {
             $scope.state.tableState = tableState;
