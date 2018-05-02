@@ -17,25 +17,39 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         }
     };
 
+    var normalizeFilter = function(fetchCount) {
+        var filter = angular.copy($scope.filter);
+        if (isDefined(fetchCount)) {
+            filter['offset'] = $scope.data.length;
+            filter['limit'] = fetchCount;
+        } else {
+            filter['offset'] = $scope.settings.itemsPerPage * ($scope.state.currentPage - 1);
+            filter['limit'] = $scope.settings.itemsPerPage;
+        }
+        filter['gender'] = $scope.filter['gender']['k'];
+        return filter;
+    };
+
     //TODO : implement basic response handler
-    var searchByFilter = function(filter) {
+    var searchByFilter = function(filter, erasePreviousData) {
         $scope.state.isLoading = true;
         PersonService.searchByFilter(filter).then(function(response) {
             if (response.result === 'OK') {
-                $scope.data.splice(0, $scope.data.length);
-
-                if ($scope.settings.itemsPerPage > response.data.length) {
+                if (erasePreviousData) {
+                    $scope.data.splice(0, $scope.data.length);
+                }
+                if (filter.limit > response.data.length) {
                     $scope.state.dataFetched = true;
                 }
 
                 angular.forEach(response.data, function(person) {
                     process(person);
                 });
-                $scope.state.isLoading = false;
-                //$scope.state.totalPages = Math.ceil($scope.data.length / $scope.settings.itemsByPage);
             } else {
                 // TODO : Implement error modal
             }
+        }).finally(function() {
+            $scope.state.isLoading = false;
         });
     };
 
@@ -44,10 +58,11 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         PersonService.getPhotoByPersonId(id).then(function(response) {
             if (response.result === 'OK') {
                 $scope.photos[id] = response.data;
-                $scope.state.isLoading = false;
             } else {
                 // TODO : Implement error modal
             }
+        }).finally(function() {
+            $scope.state.isLoading = false;
         });
     };
 
@@ -77,12 +92,8 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         genderOptions : genderOptions
     };
 
-    $scope.performSearch = function() {
-        var filter = angular.copy($scope.filter);
-        filter['page'] = $scope.state.currentPage;
-        filter['rowsPerPage'] = $scope.settings.itemsPerPage;
-        filter['gender'] = $scope.filter['gender']['k'];
-        searchByFilter(filter);
+    $scope.loadData = function(fetchCount) {
+        searchByFilter(normalizeFilter(fetchCount), false);
     };
 
     $scope.isPhotoExist = function() {
@@ -99,14 +110,6 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
 
     $scope.getPhotoData = function() {
         return $scope.photos[$scope.state.selectedPersonId];
-    };
-
-    $scope.performReset = function() {
-        for (var i in $scope.filter) {
-            if ($scope.filter.hasOwnProperty(i)) {
-                $scope.filter[i] = (i === 'gender') ? genderOptions[0] : null;
-            }
-        }
     };
 
     $scope.getPersonNameById = function(id) {
@@ -139,16 +142,6 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         }
     };
 
-    $scope.$watch('stController', function(newValue, oldValue) {
-        if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            var stSelect = $scope.stController.select;
-            $scope.stController.select = function(rowObj, mode) {
-                console.log('Selected: ' + rowObj.isSelected + ', id: ' + rowObj.id);
-                stSelect(rowObj, mode);
-            };
-        }
-    });
-
     $scope.$watch('state.selectedPersonId', function(newValue, oldValue) {
         if (angular.isDefined(newValue) && newValue !== oldValue) {
             $scope.performPhotoSelected();
@@ -157,12 +150,29 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
 
     /** ========================================== EVENT HANDLERS =================================================== */
 
+    // Handler of 'reset button was clicked' events
+    $scope.performReset = function() {
+        for (var i in $scope.filter) {
+            if ($scope.filter.hasOwnProperty(i)) {
+                $scope.filter[i] = (i === 'gender') ? genderOptions[0] : null;
+            }
+        }
+    };
+
+    // Handler of 'search button was clicked' events
+    $scope.performSearch = function() {
+        $scope.state.dataFetched = false;
+        searchByFilter(normalizeFilter(undefined), true);
+    };
+
     // Handler of 'items per page change' events
     $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            if ($scope.settings.itemsPerPage > $scope.data.length && !$scope.state.dataFetched) {
-                // TODO : if there are no records found then decrease itemsPerPage value
-                $scope.performSearch();
+            if (!$scope.state.dataFetched) {
+                if ($scope.settings.itemsPerPage > $scope.data.length) {
+                    var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
+                    $scope.loadData(fetchCount);
+                }
             }
         }
     });
@@ -170,9 +180,12 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     // Handler of 'page changed' events
     $scope.pageChanged = function(newPage) {
         if (newPage !== $scope.state.currentPage) {
-            $scope.state.currentPage = newPage;
+            var previousPage = $scope.state.currentPage;
             $scope.state.selectedPersonId = undefined;
-            $scope.performSearch();
+            $scope.state.currentPage = newPage;
+            if (previousPage < newPage) {
+                $scope.loadData();
+            }
         }
     };
 

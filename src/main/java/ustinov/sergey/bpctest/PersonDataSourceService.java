@@ -31,29 +31,7 @@ public class PersonDataSourceService {
     private EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int page, int rowsQuantity) {
-//        List<Object[]> data = entityManager.createNativeQuery(
-//            "WITH parents AS (\n" +
-//            "    SELECT\n" +
-//            "      id,\n" +
-//            "      name,\n" +
-//            "      gender\n" +
-//            "    FROM person p\n" +
-//            "      LEFT JOIN person_parent r ON p.id = r.person_id\n" +
-//            "    WHERE r.person_id IS NULL\n" +
-//            ")\n" +
-//            "SELECT person.id, person.name, person.gender, m.id AS mother_id, f.id AS father_id\n" +
-//            "FROM person\n" +
-//            "LEFT JOIN (\n" +
-//            "  SELECT o.id, r.person_id FROM parents o\n" +
-//            "  JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'F'\n" +
-//            ") m ON person.id = m.person_id\n" +
-//            "LEFT JOIN (\n" +
-//            "  SELECT o.id, r.person_id FROM parents o\n" +
-//            "    JOIN person_parent r ON o.id = r.parent_id AND o.gender = 'M'\n" +
-//            ") f ON person.id = f.person_id"
-//        )
-//        .getResultList();
+    public List<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int offset, int limit) {
         List<Object[]> data = entityManager.createNativeQuery(
             "WITH parents AS ( \n" +
             "    SELECT \n" +
@@ -90,8 +68,8 @@ public class PersonDataSourceService {
            .setParameter("motherName", wrap(mother))
            .setParameter("dontFilterByFatherName", father.isEmpty())
            .setParameter("fatherName", wrap(father))
-           .setParameter("lim", rowsQuantity)
-           .setParameter("off", rowsQuantity * (page - 1))
+           .setParameter("lim", limit)
+           .setParameter("off", offset)
            .getResultList();
 
 

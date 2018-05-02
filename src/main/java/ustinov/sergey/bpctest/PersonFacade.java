@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -36,7 +35,7 @@ public class PersonFacade {
             return null;
         }
     };
-    private static final Predicate<Integer> nonNegative = o -> o > 0;
+    private static final Predicate<Integer> nonNegative = o -> o >= 0;
 
     @Autowired
     private PersonDataSourceService personDao;
@@ -62,8 +61,8 @@ public class PersonFacade {
             s.get(PersonFilterTO::getMother),
             s.get(PersonFilterTO::getFather),
             s.get(PersonFilterTO::getChild),
-            s.get(PersonFilterTO::getPage, nonNegative, 1),
-            s.get(PersonFilterTO::getRowsPerPage, nonNegative, ROWS_PER_PAGE)
+            s.get(PersonFilterTO::getOffset, nonNegative, 0),
+            s.get(PersonFilterTO::getLimit, nonNegative, ROWS_PER_PAGE)
         );
     }
 }

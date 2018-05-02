@@ -6,8 +6,8 @@ public class PersonFilterTO {
     private String child;
     private String mother;
     private String father;
-    private int page;
-    private int rowsPerPage;
+    private int offset;
+    private int limit;
 
     public String getName() {
         return name;
@@ -49,20 +49,20 @@ public class PersonFilterTO {
         this.father = father;
     }
 
-    public int getPage() {
-        return page;
+    public int getOffset() {
+        return offset;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
-    public int getRowsPerPage() {
-        return rowsPerPage;
+    public int getLimit() {
+        return limit;
     }
 
-    public void setRowsPerPage(int rowsPerPage) {
-        this.rowsPerPage = rowsPerPage;
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     @Override
@@ -73,8 +73,8 @@ public class PersonFilterTO {
                 ", child='" + child + '\'' +
                 ", mother='" + mother + '\'' +
                 ", father='" + father + '\'' +
-                ", page=" + page +
-                ", rowsPerPage=" + rowsPerPage +
+                ", offset=" + offset +
+                ", limit=" + limit +
                 '}';
     }
 }
