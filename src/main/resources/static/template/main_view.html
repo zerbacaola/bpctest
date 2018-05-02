@@ -17,7 +17,7 @@
                     <table st-table="displayedData" st-safe-src="data"
                            bpc-st-decorate="select" bpc-st-decorate-fn="onRowSelected"
                            class="table table-sm">
-                        <thead>
+                        <thead bpc-st-decorate="tableState" bpc-st-decorate-fn="onTableStateRequested">
                         <!-- TODO: implement filtering of results -->
                         <!--tr>
                             <th>

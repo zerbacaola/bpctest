@@ -7,6 +7,8 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         { k : 'FEMALE',  v : $translate.instant('FEMALE') }
     ];
 
+    var stub = {};
+
     var isDefined = function(v) {
         return angular.isDefined(v) && v != null;
     };
@@ -38,13 +40,15 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
                 if (erasePreviousData) {
                     $scope.data.splice(0, $scope.data.length);
                 }
-                if (filter.limit > response.data.length) {
-                    $scope.state.dataFetched = true;
-                }
-
                 angular.forEach(response.data, function(person) {
                     process(person);
                 });
+                if (filter.limit > response.data.length) {
+                    $scope.state.dataFetched = true;
+                } else {
+                    // This is for displaying the next page button
+                    process(stub);
+                }
             } else {
                 // TODO : Implement error modal
             }
@@ -53,10 +57,19 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         });
     };
 
-    var loadData = function() {
+    var loadData = function(performCheckerFn) {
+        // Remove stub
+        if (!isDefined($scope.data[$scope.data.length - 1]['id'])) {
+            $scope.data.splice($scope.data.length - 1, 1);
+        }
+
         if (!$scope.state.dataFetched) {
-            var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
-            searchByFilter(normalizeFilter(fetchCount), false);
+            if (performCheckerFn()) {
+                var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
+                searchByFilter(normalizeFilter(fetchCount), false);
+            } else {
+                process(stub);
+            }
         }
     };
 
@@ -85,6 +98,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     };
 
     $scope.state = {
+        tableState : undefined,
         isLoading : false,
         currentPage : 1,
         selectedPersonId : undefined,
@@ -151,6 +165,18 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         }
     });
 
+    $scope.onTableStateRequested = function(commonFn, stController) {
+        delete arguments[--arguments.length];
+        delete arguments[--arguments.length];
+        var tableState = commonFn.apply(stController, arguments);
+        //console.log('totalItemCount: ' + tableState.pagination.totalItemCount + ' start: ' + tableState.pagination.start + ' number: ' + tableState.pagination.number + ' STUB: ' + $scope.state.stubIsPresent);
+
+        if (!isDefined($scope.state.tableState)) {
+            $scope.state.tableState = tableState;
+        }
+        return tableState;
+    };
+
     /** ========================================== EVENT HANDLERS =================================================== */
 
     // Handler of 'reset button was clicked' events
@@ -171,9 +197,9 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     // Handler of 'items per page change' events
     $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            if ($scope.settings.itemsPerPage > $scope.data.length) {
-                loadData();
-            }
+            loadData(function() {
+                return $scope.settings.itemsPerPage > $scope.data.length;
+            });
         }
     });
 
@@ -184,9 +210,9 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
             $scope.state.selectedPersonId = undefined;
             $scope.state.currentPage = newPage;
             if (previousPage < newPage) {
-                if ($scope.data.length < $scope.settings.itemsPerPage * $scope.state.currentPage) {
-                    loadData();
-                }
+                loadData(function() {
+                    return $scope.data.length < $scope.settings.itemsPerPage * $scope.state.currentPage;
+                });
             }
         }
     };
