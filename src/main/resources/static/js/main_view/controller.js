@@ -24,6 +24,10 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
             if (response.result === 'OK') {
                 $scope.data.splice(0, $scope.data.length);
 
+                if ($scope.settings.itemsPerPage > response.data.length) {
+                    $scope.state.dataFetched = true;
+                }
+
                 angular.forEach(response.data, function(person) {
                     process(person);
                 });
@@ -61,7 +65,9 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     $scope.state = {
         isLoading : false,
         currentPage : 1,
-        selectedPersonId : undefined
+        selectedPersonId : undefined,
+        // For current filter
+        dataFetched : false
     };
 
     $scope.settings = {
@@ -154,7 +160,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     // Handler of 'items per page change' events
     $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            if ($scope.settings.itemsPerPage > $scope.data.length) {
+            if ($scope.settings.itemsPerPage > $scope.data.length && !$scope.state.dataFetched) {
                 // TODO : if there are no records found then decrease itemsPerPage value
                 $scope.performSearch();
             }
