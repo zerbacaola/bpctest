@@ -30,7 +30,7 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         return filter;
     };
 
-    //TODO : implement basic response handler
+    //TODO : implement common response handler
     var searchByFilter = function(filter, erasePreviousData) {
         $scope.state.isLoading = true;
         PersonService.searchByFilter(filter).then(function(response) {
@@ -51,6 +51,13 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
         }).finally(function() {
             $scope.state.isLoading = false;
         });
+    };
+
+    var loadData = function() {
+        if (!$scope.state.dataFetched) {
+            var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
+            searchByFilter(normalizeFilter(fetchCount), false);
+        }
     };
 
     var fetchPersonPhoto = function(id) {
@@ -88,12 +95,8 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     $scope.settings = {
         displayedPages : 10,
         itemsPerPage : 1,
-        itemsPerPageOptions : [1, 3, 10, 20, 30, 40, 50, 100],
+        itemsPerPageOptions : [1, 2, 3, 10, 20, 30, 40, 50, 100],
         genderOptions : genderOptions
-    };
-
-    $scope.loadData = function(fetchCount) {
-        searchByFilter(normalizeFilter(fetchCount), false);
     };
 
     $scope.isPhotoExist = function() {
@@ -168,11 +171,8 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
     // Handler of 'items per page change' events
     $scope.$watch('settings.itemsPerPage', function(newValue, oldValue) {
         if (!angular.isUndefined(newValue) && newValue !== oldValue) {
-            if (!$scope.state.dataFetched) {
-                if ($scope.settings.itemsPerPage > $scope.data.length) {
-                    var fetchCount = $scope.state.currentPage * $scope.settings.itemsPerPage - $scope.data.length;
-                    $scope.loadData(fetchCount);
-                }
+            if ($scope.settings.itemsPerPage > $scope.data.length) {
+                loadData();
             }
         }
     });
@@ -184,7 +184,9 @@ mainModule.controller('PersonController', function ($scope, $translate, PersonSe
             $scope.state.selectedPersonId = undefined;
             $scope.state.currentPage = newPage;
             if (previousPage < newPage) {
-                $scope.loadData();
+                if ($scope.data.length < $scope.settings.itemsPerPage * $scope.state.currentPage) {
+                    loadData();
+                }
             }
         }
     };
