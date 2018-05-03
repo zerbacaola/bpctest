@@ -98,6 +98,14 @@
                 </includes>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <targetPath>${pom.build.outputDirectory}</targetPath>
+                <excludes>
+                    <exclude>application.properties</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
         </resources>
     </build>
 
