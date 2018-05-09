@@ -1,5 +1,6 @@
 package ustinov.sergey.bpctest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +16,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-import static ustinov.sergey.bpctest.PersonTO.TRANSFORMER;
+import static ustinov.sergey.bpctest.PersonTO.getTransformer;
 import static ustinov.sergey.bpctest.SafeGetter.EMPTY;
 import static ustinov.sergey.bpctest.SafeGetter.wrap;
 
 // TODO : define transaction isolated levels
 // TODO : optimize SQL
-// TODO : implement search by children
 // TODO : implement entinites
 @Transactional
 @Repository
 public class PersonDataSourceService {
+
+    @Value("${db.vendor}")
+    private String dbVendor;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -59,7 +62,7 @@ public class PersonDataSourceService {
                 "    AND (:dontFilterByName OR LOWER(person.name) LIKE LOWER(:name))\n" +
                 "    AND (:dontFilterByMotherName OR LOWER(m.name) LIKE LOWER(:motherName))\n" +
                 "    AND (:dontFilterByFatherName OR LOWER(f.name) LIKE LOWER(:fatherName))\n" +
-                "  OFFSET :off LIMIT :lim\n" +
+                "  LIMIT :lim OFFSET :off \n" +
                 ")\n" +
                 "SELECT pc.*, ps.id AS child_id, ps.name AS child_name\n" +
                 "  FROM parents_with_childrens pc\n" +
@@ -82,7 +85,7 @@ public class PersonDataSourceService {
            .setParameter("off", offset)
            .getResultList();
 
-        List<PersonTO> personTOs = data.stream().map(TRANSFORMER)
+        List<PersonTO> personTOs = data.stream().map(getTransformer(getDbVendor()))
             .collect(Collectors.toList());
 
         Map<Long, PersonTO> personTOsMapper = personTOs.stream()
@@ -100,14 +103,18 @@ public class PersonDataSourceService {
     @Nullable
     public byte[] getPhoto(long personId) {
         try {
-             byte[] photo = (byte[]) entityManager.createNativeQuery(
-                "SELECT data FROM person_photo WHERE person_id = :personId"
+            PersonPhoto photo = entityManager.createQuery(
+                "SELECT p FROM PersonPhoto p WHERE p.personId = :personId", PersonPhoto.class
             )
             .setParameter("personId", personId)
             .getSingleResult();
-            return photo;
+            return photo.getData();
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    private DbVendor getDbVendor() {
+        return DbVendor.valueOf(dbVendor);
     }
 }

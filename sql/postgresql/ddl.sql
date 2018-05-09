@@ -1,9 +1,9 @@
 -- SERIAL IS too short for ID storing
 BEGIN;
 CREATE TABLE person (
-  id        SERIAL PRIMARY KEY NOT NULL,
-  created   TIMESTAMP WITH TIME ZONE,
-  modified  TIMESTAMP WITH TIME ZONE,
+  id        BIGSERIAL PRIMARY KEY NOT NULL,
+  created   TIMESTAMP WITHOUT TIME ZONE,
+  modified  TIMESTAMP WITHOUT TIME ZONE,
   version   INTEGER NOT NULL DEFAULT 0,
   name      VARCHAR (255) NOT NULL,
   gender    VARCHAR (1) NOT NULL
@@ -25,9 +25,9 @@ ALTER TABLE person_parent ADD CONSTRAINT fk_person_parent_parent_id
 FOREIGN KEY (parent_id) REFERENCES person;
 
 CREATE TABLE person_photo (
-  id        SERIAL PRIMARY KEY NOT NULL,
-  created   TIMESTAMP WITH TIME ZONE,
-  modified  TIMESTAMP WITH TIME ZONE,
+  id        BIGSERIAL PRIMARY KEY NOT NULL,
+  created   TIMESTAMP WITHOUT TIME ZONE,
+  modified  TIMESTAMP WITHOUT TIME ZONE,
   version   INTEGER NOT NULL DEFAULT 0,
   data      BYTEA,
   person_id BIGINT
@@ -36,16 +36,5 @@ CREATE TABLE person_photo (
 CREATE INDEX idx_person_photo_person_id ON person_photo(person_id);
 ALTER TABLE person_photo ADD CONSTRAINT fk_person_photo_person_id
 FOREIGN KEY (person_id) REFERENCES person;
-
-CREATE OR REPLACE FUNCTION import_bytea(p_path text, p_result out bytea)
-LANGUAGE plpgsql AS $$
-  DECLARE
-    l_oid oid;
-  BEGIN
-    SELECT lo_import(p_path) INTO l_oid;
-    SELECT lo_get(l_oid) INTO p_result;
-    PERFORM lo_unlink(l_oid);
-  END;
-$$;
 
 COMMIT;

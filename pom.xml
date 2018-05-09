@@ -17,10 +17,8 @@
     <profiles>
         <profile>
             <id>postgres</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
+                <bpc.db.vendor>POSTGRES</bpc.db.vendor>
                 <bpc.db.dialect>org.hibernate.dialect.PostgreSQL95Dialect</bpc.db.dialect>
                 <bpc.jdbc.prefix>jdbc:postgresql://${db.host}:5432/</bpc.jdbc.prefix>
             </properties>
@@ -34,7 +32,11 @@
         </profile>
         <profile>
             <id>sqlite</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
+                <bpc.db.vendor>SQLITE</bpc.db.vendor>
                 <bpc.db.dialect>ustinov.sergey.bpctest.SQLiteDialect</bpc.db.dialect>
                 <bpc.jdbc.prefix>jdbc:sqlite:</bpc.jdbc.prefix>
             </properties>
@@ -80,6 +82,14 @@
             <version>3.0.2</version>
         </dependency>
 
+        <!-- Uncomment this dependency for debugging SQLite -->
+        <!--dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.8.11.1</version>
+        </dependency-->
+        <!-- Uncomment this dependency for debugging SQLite -->
+
     </dependencies>
     <build>
         <plugins>
@@ -92,7 +102,7 @@
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
-                <targetPath>${pom.build.outputDirectory}</targetPath>
+                <targetPath>${project.build.outputDirectory}</targetPath>
                 <includes>
                     <include>application.properties</include>
                 </includes>
@@ -100,7 +110,7 @@
             </resource>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
-                <targetPath>${pom.build.outputDirectory}</targetPath>
+                <targetPath>${project.build.outputDirectory}</targetPath>
                 <excludes>
                     <exclude>application.properties</exclude>
                 </excludes>

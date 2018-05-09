@@ -11,47 +11,50 @@ import java.util.function.Function;
 import static java.util.Optional.ofNullable;
 import static ustinov.sergey.bpctest.Gender.FEMALE;
 import static ustinov.sergey.bpctest.Gender.MALE;
+import static ustinov.sergey.bpctest.SQLUtils.map64BitNumber;
 
 public class PersonTO {
+    public static Function<Object[], PersonTO> getTransformer(final DbVendor dbVendor) {
+        return array -> {
 
-    public static final Function<Object[], PersonTO> TRANSFORMER = array -> {
-        final PersonTO p = new PersonTO(
-            ((Integer) array[0]).longValue(),
-            (String) array[1],
-            Gender.parse((String) array[2])
-        );
+            final PersonTO p = new PersonTO(
+                map64BitNumber(dbVendor, array[0]),
+                (String) array[1],
+                Gender.parse((String) array[2])
+            );
 
-        final PersonRef mRef = new PersonRef();
+            final PersonRef mRef = new PersonRef();
 
-        ofNullable((Integer) array[3]).map(Integer::longValue)
-            .ifPresent(mRef::setId);
-        ofNullable((String) array[4])
-            .ifPresent(mRef::setName);
+            ofNullable(array[3]).map(i -> map64BitNumber(dbVendor, i))
+                .ifPresent(mRef::setId);
+            ofNullable((String) array[4])
+                .ifPresent(mRef::setName);
 
-        p.getParents().put(FEMALE, mRef);
+            p.getParents().put(FEMALE, mRef);
 
-        final PersonRef fRef = new PersonRef();
+            final PersonRef fRef = new PersonRef();
 
-        ofNullable((Integer) array[5]).map(Integer::longValue)
-            .ifPresent(fRef::setId);
-        ofNullable((String) array[6])
-            .ifPresent(fRef::setName);
+            ofNullable(array[5]).map(i -> map64BitNumber(dbVendor, i))
+                .ifPresent(fRef::setId);
+            ofNullable((String) array[6])
+                .ifPresent(fRef::setName);
 
-        final PersonRef ref = new PersonRef();
+            final PersonRef ref = new PersonRef();
 
-        p.getParents().put(MALE, fRef);
+            p.getParents().put(MALE, fRef);
 
-        ofNullable((Integer) array[7]).map(Integer::longValue)
-            .ifPresent(ref::setId);
-        ofNullable((String) array[8])
-            .ifPresent(ref::setName);
+            ofNullable(array[7]).map(i -> map64BitNumber(dbVendor, i))
+                .ifPresent(ref::setId);
+            ofNullable((String) array[8])
+                .ifPresent(ref::setName);
 
-        if (ref.isInitialized()) {
-            p.getChilds().add(ref);
-        }
+            if (ref.isInitialized()) {
+                p.getChilds().add(ref);
+            }
 
-        return p;
-    };
+            return p;
+        };
+    }
 
     private long id;
     private String name;
