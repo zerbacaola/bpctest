@@ -1,4 +1,4 @@
-package ustinov.sergey.bpctest;
+package ustinov.sergey.bpctest.to;
 
 public class JsonResult<T> {
 

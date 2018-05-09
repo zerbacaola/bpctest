@@ -37,7 +37,7 @@
             </activation>
             <properties>
                 <bpc.db.vendor>SQLITE</bpc.db.vendor>
-                <bpc.db.dialect>ustinov.sergey.bpctest.SQLiteDialect</bpc.db.dialect>
+                <bpc.db.dialect>ustinov.sergey.bpctest.utils.SQLiteDialect</bpc.db.dialect>
                 <bpc.jdbc.prefix>jdbc:sqlite:</bpc.jdbc.prefix>
             </properties>
             <dependencies>

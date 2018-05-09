@@ -3,6 +3,10 @@ package ustinov.sergey.bpctest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ustinov.sergey.bpctest.model.PersonPhoto;
+import ustinov.sergey.bpctest.model.enums.DbVendor;
+import ustinov.sergey.bpctest.model.enums.Gender;
+import ustinov.sergey.bpctest.to.PersonTO;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,9 +20,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-import static ustinov.sergey.bpctest.PersonTO.getTransformer;
-import static ustinov.sergey.bpctest.SafeGetter.EMPTY;
-import static ustinov.sergey.bpctest.SafeGetter.wrap;
+import static ustinov.sergey.bpctest.to.PersonTO.TRANSFORMER;
+import static ustinov.sergey.bpctest.utils.SafeGetter.EMPTY;
+import static ustinov.sergey.bpctest.utils.SafeGetter.wrap;
 
 // TODO : define transaction isolated levels
 // TODO : optimize SQL
@@ -37,13 +41,12 @@ public class PersonDataSourceService {
     public Collection<PersonTO> search(@Nullable Gender gender, @Nonnull String name, @Nonnull String mother, @Nonnull String father, @Nonnull String child, int offset, int limit) {
         List<Object[]> data = entityManager.createNativeQuery(
                 "WITH parents AS (\n" +
-                "    SELECT \n" +
-                "      id, \n" +
-                "      name, \n" +
-                "      gender\n" +
-                "    FROM person p \n" +
-                "      LEFT JOIN person_parent r ON p.id = r.person_id \n" +
-                "    WHERE r.person_id IS NULL \n" +
+                "   SELECT DISTINCT\n" +
+                "      p.id,\n" +
+                "      p.name,\n" +
+                "      p.gender\n" +
+                "   FROM person_parent pp\n" +
+                "       JOIN person p ON pp.parent_id = p.id\n" +
                 "),\n" +
                 "parents_with_childrens AS (\n" +
                 "  SELECT  person.id, person.name, person.gender,\n" +
@@ -85,7 +88,7 @@ public class PersonDataSourceService {
            .setParameter("off", offset)
            .getResultList();
 
-        List<PersonTO> personTOs = data.stream().map(getTransformer(getDbVendor()))
+        List<PersonTO> personTOs = data.stream().map(TRANSFORMER)
             .collect(Collectors.toList());
 
         Map<Long, PersonTO> personTOsMapper = personTOs.stream()

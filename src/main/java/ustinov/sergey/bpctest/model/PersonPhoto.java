@@ -1,4 +1,4 @@
-package ustinov.sergey.bpctest;
+package ustinov.sergey.bpctest.model;
 
 import javax.persistence.*;
 import java.util.Date;

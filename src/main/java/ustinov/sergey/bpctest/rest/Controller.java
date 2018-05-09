@@ -1,9 +1,13 @@
-package ustinov.sergey.bpctest;
+package ustinov.sergey.bpctest.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ustinov.sergey.bpctest.to.JsonResult;
+import ustinov.sergey.bpctest.PersonFacade;
+import ustinov.sergey.bpctest.to.PersonFilterTO;
+import ustinov.sergey.bpctest.to.PersonTO;
 
 import javax.validation.Valid;
 import java.util.Base64;
@@ -12,7 +16,7 @@ import java.util.Collections;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static ustinov.sergey.bpctest.SafeGetter.EMPTY;
+import static ustinov.sergey.bpctest.utils.SafeGetter.EMPTY;
 
 @RestController
 public class Controller {

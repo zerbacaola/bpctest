@@ -1,4 +1,4 @@
-package ustinov.sergey.bpctest;
+package ustinov.sergey.bpctest.utils;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;

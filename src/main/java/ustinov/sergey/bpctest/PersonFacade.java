@@ -4,6 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ustinov.sergey.bpctest.model.enums.Gender;
+import ustinov.sergey.bpctest.to.PersonFilterTO;
+import ustinov.sergey.bpctest.to.PersonTO;
+import ustinov.sergey.bpctest.utils.SafeGetter;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
